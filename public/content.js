@@ -55,6 +55,7 @@ function addItem(selector, outerHTML) {
     outerHTML,
     checkOuterHTML: true,
     lastError: null,
+    once: true
   }
 
   chrome.storage.local.set({ autoclick_data: data })
@@ -65,7 +66,7 @@ window.addEventListener("pointerdown", e => {
     let selector = getSelector(e.target)
     let nodes = [...document.querySelectorAll(selector)]
     if (nodes.length != 1) {
-      alert("NO")
+      alert(`Error: Selector '${selector}' selects ${nodes.length} elements.`)
       return
     }
     console.log(selector);
@@ -103,30 +104,34 @@ window.addEventListener("load", async () => {
   }, 500);
 })
 
-function clickTheThings(parent = document) {
+let clickedIds = []
+
+function clickTheThings() {
   let relevantItems = Object.entries(data.items).filter(([k, i]) => i.enabled && (new RegExp(i.urlPattern).test(location.href)))
 
   for (const [k, i] of relevantItems) {
-    let nodes = [...parent.querySelectorAll(i.selector)]
+    if (i.once && clickedIds.includes(k)) continue;
+    let nodes = [...document.querySelectorAll(i.selector)]
 
     if (nodes.length > 1) {
       setError(k, `Selector matches ${nodes.length} elements`)
     }
     if (nodes.length != 1) {
-      console.warn(`Selector '${i.selector}' selects ${nodes.length} nodes.`);
-      break;
+      console.log(`Selector '${i.selector}' selects ${nodes.length} nodes.`);
+      continue;
     }
     if (nodes[0].outerHTML != i.outerHTML) {
       setError(k, `outerHTML of selected element does not match`)
-      break
+      continue
     }
     if (typeof nodes[0].click != "function") {
       setError(k, `Selected element is not clickable`)
-      break
+      continue
     }
     nodes[0].click()
-    console.log("Clicking",nodes[0]);
-    
+    console.log("Clicking", nodes[0]);
+    clickedIds.push(k)
+
     setError(k, null)
   }
 }

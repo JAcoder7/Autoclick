@@ -11,6 +11,7 @@ type Data = {
       outerHTML: string,
       checkOuterHTML: boolean,
       lastError: null | string,
+      once:boolean
     }
   }
 }
