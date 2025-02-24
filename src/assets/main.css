@@ -1,0 +1,17 @@
+body {
+  width: 600px !important;
+  height: 400px !important;
+  transition: height .25s ease-out allow-discrete;
+  font-size: 1rem !important;
+}
+
+@starting-style {
+  body {
+  height: 0 !important;
+
+  }
+}
+
+:root {
+  font-size: 14px;
+}
