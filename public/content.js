@@ -108,7 +108,6 @@ let clickedIds = []
 
 function clickTheThings() {
   let relevantItems = Object.entries(data.items).filter(([k, i]) => i.enabled && (new RegExp(i.urlPattern).test(location.href)))
-
   for (const [k, i] of relevantItems) {
     if (i.once && clickedIds.includes(k)) continue;
     let nodes = [...document.querySelectorAll(i.selector)]
@@ -120,7 +119,7 @@ function clickTheThings() {
       console.log(`Selector '${i.selector}' selects ${nodes.length} nodes.`);
       continue;
     }
-    if (nodes[0].outerHTML != i.outerHTML) {
+    if (i.checkOuterHTML && nodes[0].outerHTML != i.outerHTML) {
       setError(k, `outerHTML of selected element does not match`)
       continue
     }
@@ -137,6 +136,8 @@ function clickTheThings() {
 }
 
 function setError(id, e) {
+  console.warn(data.items[id].selector, e);
+
   data.items[id].lastError = e
 
   chrome.storage.local.set({ autoclick_data: data })
@@ -151,30 +152,32 @@ function getSelector(element) {
   if (element == document.body) {
     return "body"
   }
+  let l, selector
   if (element.hasAttribute("id")) {
-    return "#" + element.id
-  }
-
-  let selector = getSelector(element.parentElement) + " > " + element.nodeName.toLowerCase()
-
-  let l = document.querySelectorAll(selector).length;
-  if (l == 0) throw new Error("");//TODO:Errormessage
-  if (l > 1) {
-    let classes = [...element.classList.values()].map(c => "." + c).join("")
-
-    let l = document.querySelectorAll(selector + classes).length;
-    if (l == 0) throw new Error("");//TODO:Errormessage
-    if (l > 1) {
-      let sibling = element, nth = 1;
-      while (sibling = sibling.previousElementSibling) {
-        nth++;
-      }
-      return selector + `:nth-child(${nth})`;
-    } else {
-      return selector + classes
-    }
+    selector = "#" + element.id
+    l = document.querySelectorAll(selector).length;
+    if (l <= 0) throw new Error("");//TODO:Errormessage
+    if (l == 1) return selector
   } else {
-    return selector
+    selector = element.nodeName.toLowerCase()
   }
 
+  selector = getSelector(element.parentElement) + " > " + selector
+
+  l = document.querySelectorAll(selector).length;
+  if (l <= 0) throw new Error("");//TODO:Errormessage
+  if (l == 1) return selector
+
+
+  let classes = [...element.classList.values()].map(c => "." + c).join("")
+
+  l = document.querySelectorAll(selector + classes).length;
+  if (l <= 0) throw new Error("");//TODO:Errormessage
+  if (l == 1) return selector + classes
+
+  let sibling = element, nth = 1;
+  while (sibling = sibling.previousElementSibling) {
+    nth++;
+  }
+  return selector + `:nth-child(${nth})`;
 }

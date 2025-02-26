@@ -58,10 +58,16 @@ async function send() {
         <input class="transparent itemInput" v-model="i.selector">
         <input class="transparent itemInput subtle-text" v-model="i.urlPattern" style="font-size: 0.875em;">
       </div>
-      <button class="subtle small" @click="() => { data.items[id].once=false }" v-if="i.once">
+      <button class="subtle small" @click="() => { data.items[id].checkOuterHTML = false }" v-if="i.checkOuterHTML">
+        <Icon t="equal_circle" :size="16" />
+      </button>
+      <button class="subtle small" @click="() => { data.items[id].checkOuterHTML = true }" v-else>
+        <Icon t="equal_off" :size="16" />
+      </button>
+      <button class="subtle small" @click="() => { data.items[id].once = false }" v-if="i.once">
         <Icon t="arrow_repeat_all_off" :size="16" />
       </button>
-      <button class="subtle small" @click="() => { data.items[id].once=true }" v-else>
+      <button class="subtle small" @click="() => { data.items[id].once = true }" v-else>
         <Icon t="arrow_repeat_all" :size="16" />
       </button>
       <button class="subtle small" @click="() => { delete data.items[id] }">
