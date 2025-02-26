@@ -119,13 +119,16 @@ function clickTheThings() {
       console.log(`Selector '${i.selector}' selects ${nodes.length} nodes.`);
       continue;
     }
-    if (i.checkOuterHTML && nodes[0].outerHTML != i.outerHTML) {
+    if (i.checkOuterHTML && i.outerHTML != null && nodes[0].outerHTML != i.outerHTML) {
       setError(k, `outerHTML of selected element does not match`)
       continue
     }
     if (typeof nodes[0].click != "function") {
       setError(k, `Selected element is not clickable`)
       continue
+    }
+    if (i.outerHTML == null) {
+      i.outerHTML = nodes[0].outerHTML
     }
     nodes[0].click()
     console.log("Clicking", nodes[0]);

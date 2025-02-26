@@ -50,14 +50,13 @@ async function send() {
       <Icon t="cursor_hover" :size="16" />
     </button>
   </header>
-  <main class="p-m flex-col gap-s">
+  <main class="p-m flex-col gap-m">
     <div v-for="i, id in searchedItems" class="flex-center subtle small px-m gap-m">
-      <Icon t="error_circle" style="color: tomato;" v-if="i.lastError" :title="i.lastError" />
-      <Icon t="cursor_click" filled v-else />
       <div class="flex-col grow">
-        <input class="transparent itemInput" v-model="i.selector">
+        <input class="transparent itemInput" v-model="i.selector" @change="()=>i.outerHTML=null">
         <input class="transparent itemInput subtle-text" v-model="i.urlPattern" style="font-size: 0.875em;">
       </div>
+      <Icon t="error_circle" style="color: tomato;" v-if="i.lastError" :title="i.lastError" />
       <button class="subtle small" @click="() => { data.items[id].checkOuterHTML = false }" v-if="i.checkOuterHTML">
         <Icon t="equal_circle" :size="16" />
       </button>
@@ -79,10 +78,6 @@ async function send() {
 </template>
 
 <style scoped>
-header {
-  border-bottom: var(--site-stroke);
-}
-
 button {
   justify-content: start;
 }

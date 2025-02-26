@@ -8,10 +8,10 @@ type Data = {
       selector: string,
       urlPattern: string,
       enabled: boolean,
-      outerHTML: string,
+      outerHTML: string | null,
       checkOuterHTML: boolean,
       lastError: null | string,
-      once:boolean
+      once: boolean
     }
   }
 }
